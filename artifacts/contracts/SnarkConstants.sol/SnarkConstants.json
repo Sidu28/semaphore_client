@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "SnarkConstants",
+  "sourceName": "contracts/SnarkConstants.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220f645572f40cba7b8c8e7676d6be643883bd9d3fcba954c77c4b132841a0a821964736f6c63430008040033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220f645572f40cba7b8c8e7676d6be643883bd9d3fcba954c77c4b132841a0a821964736f6c63430008040033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
