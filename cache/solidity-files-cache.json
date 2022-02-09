@@ -1,8 +1,8 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/Users/sidu/Downloads/semaphore_server/contracts/Hasher.sol": {
-      "lastModificationDate": 1644208288458,
+    "/Users/sidu/Downloads/semaphore_client/contracts/Hasher.sol": {
+      "lastModificationDate": 1644211195843,
       "contentHash": "68d2bcfca05768f92b5f50816a05666f",
       "sourceName": "contracts/Hasher.sol",
       "solcConfig": {
@@ -39,8 +39,8 @@
         "Hasher"
       ]
     },
-    "/Users/sidu/Downloads/semaphore_server/contracts/Poseidon.sol": {
-      "lastModificationDate": 1644208288456,
+    "/Users/sidu/Downloads/semaphore_client/contracts/Poseidon.sol": {
+      "lastModificationDate": 1644211195843,
       "contentHash": "ef7cdcdb5f708a8dd5976b5e3fdebbb2",
       "sourceName": "contracts/Poseidon.sol",
       "solcConfig": {
@@ -75,8 +75,8 @@
         "PoseidonT6"
       ]
     },
-    "/Users/sidu/Downloads/semaphore_server/contracts/SnarkConstants.sol": {
-      "lastModificationDate": 1644208288459,
+    "/Users/sidu/Downloads/semaphore_client/contracts/SnarkConstants.sol": {
+      "lastModificationDate": 1644211195844,
       "contentHash": "12ba0bf88b4f32ad6bff167cebe873fa",
       "sourceName": "contracts/SnarkConstants.sol",
       "solcConfig": {
@@ -110,8 +110,8 @@
         "SnarkConstants"
       ]
     },
-    "/Users/sidu/Downloads/semaphore_server/contracts/IncrementalMerkleTree.sol": {
-      "lastModificationDate": 1644208288452,
+    "/Users/sidu/Downloads/semaphore_client/contracts/IncrementalMerkleTree.sol": {
+      "lastModificationDate": 1644211195842,
       "contentHash": "1191bc103b51ae921d120420648b135c",
       "sourceName": "contracts/IncrementalMerkleTree.sol",
       "solcConfig": {
@@ -149,8 +149,8 @@
         "IncrementalQuinTree"
       ]
     },
-    "/Users/sidu/Downloads/semaphore_server/contracts/Ownable.sol": {
-      "lastModificationDate": 1644208288451,
+    "/Users/sidu/Downloads/semaphore_client/contracts/Ownable.sol": {
+      "lastModificationDate": 1644211195841,
       "contentHash": "79ccdac8e39cf8f9d8004981d64be211",
       "sourceName": "contracts/Ownable.sol",
       "solcConfig": {
@@ -184,8 +184,8 @@
         "Ownable"
       ]
     },
-    "/Users/sidu/Downloads/semaphore_server/contracts/Semaphore.sol": {
-      "lastModificationDate": 1644209470714,
+    "/Users/sidu/Downloads/semaphore_client/contracts/Semaphore.sol": {
+      "lastModificationDate": 1644211195841,
       "contentHash": "6be2619f145953109e1706eb9f2e16d0",
       "sourceName": "contracts/Semaphore.sol",
       "solcConfig": {
@@ -223,8 +223,8 @@
         "Semaphore"
       ]
     },
-    "/Users/sidu/Downloads/semaphore_server/contracts/Verifier.sol": {
-      "lastModificationDate": 1644208288454,
+    "/Users/sidu/Downloads/semaphore_client/contracts/Verifier.sol": {
+      "lastModificationDate": 1644211195842,
       "contentHash": "6de459577180bb105c04275842eb0deb",
       "sourceName": "contracts/Verifier.sol",
       "solcConfig": {
@@ -259,8 +259,8 @@
         "Verifier"
       ]
     },
-    "/Users/sidu/Downloads/semaphore_server/contracts/SemaphoreClient.sol": {
-      "lastModificationDate": 1644208288449,
+    "/Users/sidu/Downloads/semaphore_client/contracts/SemaphoreClient.sol": {
+      "lastModificationDate": 1644211195841,
       "contentHash": "9878e94b606da9a0a56a5cba261a1827",
       "sourceName": "contracts/SemaphoreClient.sol",
       "solcConfig": {

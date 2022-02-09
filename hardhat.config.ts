@@ -1,4 +1,3 @@
-import "@nomiclabs/hardhat-ethers"
 import "@nomiclabs/hardhat-waffle"
 import "@typechain/hardhat"
 import { config as dotenvConfig } from "dotenv"
@@ -6,15 +5,16 @@ import "hardhat-gas-reporter"
 import { HardhatUserConfig } from "hardhat/config"
 import { resolve } from "path"
 import "solidity-coverage"
-import { config } from "/Users/sidu/Downloads/semaphore_server/package.json"
+import { config } from "/Users/sidu/Downloads/semaphore_client/package.json"
 import "./tasks/deploySemphore"
 import "@nomiclabs/hardhat-ethers"
 import "@nomiclabs/hardhat-etherscan"
 
-const { RINKEBY_API_URL, ROPSTEN_API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
+
+const {RINKEBY_API_URL, ROPSTEN_API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 
-dotenvConfig({ path: resolve(__dirname, "./.env") })
+//dotenvConfig({ path: resolve(__dirname, "./.env") })
 
 const hardhatConfig: HardhatUserConfig = {
   solidity: config.solidity,
@@ -37,10 +37,9 @@ const hardhatConfig: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      ropsten: ETHERSCAN_API_KEY,
-      rinkeby: ETHERSCAN_API_KEY,    }
+      rinkeby: "DXYGH5PDSUKHP5FZQWS6T6FYTCG4U1E7HH"
+    }
   },
-
   gasReporter: {
     currency: "USD",
     enabled: process.env.REPORT_GAS === "true",

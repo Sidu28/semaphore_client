@@ -1,8 +1,27 @@
+import { ZkIdentity } from "@zk-kit/identity"
+import { poseidon } from "circomlibjs"
 import { IncrementalMerkleTree } from "@zk-kit/incremental-merkle-tree"
 import { Semaphore, genExternalNullifier,generateMerkleProof } from "@zk-kit/protocols"
 
-import { ZkIdentity } from "@zk-kit/identity"
-import { poseidon } from "circomlibjs"
+const process = require("process");
+require("dotenv").config();
+
+
+const ALCHEMY_KEY = process.env.RINKEBY_API_URL;
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+
+//initalize alchemy API
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const web3 = createAlchemyWeb3(ALCHEMY_KEY);
+
+//contract data
+const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
+const address = "0xB48d480AD73E573B313cdaD26CD7e0972e000878"
+
+
+const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, address);
 
 
 const tree = new IncrementalMerkleTree(poseidon, 16, BigInt(0), 2) // Binary tree.
@@ -11,10 +30,11 @@ async function main() {
 
     var identity;
     var identityCommitment;
-    
-    [identity, identityCommitment] = await registerIdentity();
+    var identityNullifier;
 
-    console.log(identityCommitment)
+    [identity, identityCommitment, identityNullifier] = await registerIdentity();
+
+
     const merkleProof = await genMerkleProof(identityCommitment);
 
     var externalNullifier;
@@ -22,30 +42,37 @@ async function main() {
     [externalNullifier, proof] = await createZKProof(identity, merkleProof)
 
 
+    //var identityNullifier = identity.getNullifier()
+    var nullifierHash = Semaphore.genNullifierHash(externalNullifier,identityNullifier)
 
+
+    broadcastSignal(0, proof, tree.root, nullifierHash, externalNullifier)
     clearTree()
-
-
-
 }
 
+
+async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any, externalNullifier:any){
+  await semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier).send()
+}
 async function registerIdentity(){
 
   const identity = new ZkIdentity()
   const identityCommitment = identity.genIdentityCommitment();
 
-  console.log(tree)
+
 
 
   tree.insert(identityCommitment)
 
-  console.log(tree)
+
+
+  const identityNullifier = identity.getNullifier()
 
   // let reg = document.getElementById("register")
   // let output = document.createElement("p");
   // output.textContent = "identity: " + identity.toString() + ", identity commitment: "+ identityCommitment.toString();
   // reg.append(output);
-  return [identity, identityCommitment]
+  return [identity, identityCommitment, identityNullifier]
 }
 
 async function genMerkleProof(leaf:any){
