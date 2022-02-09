@@ -1,10 +1,10 @@
-# semaphore_client
+# Zero knowledge Voting System based on Semaphore V2.0.0 
 
 install dependencies:
 `npm install`
 
 compile contracts:
-`npx hardhat run`
+`npx hardhat compile`
 
 deploy contract
 `npm run deploy:semaphore`
