@@ -4,7 +4,7 @@ install dependencies:
 `npm install`
 
 compile contracts:
-`npx hardhat run`
+`npx hardhat compile`
 
 deploy contract
 `npm run deploy:semaphore`
