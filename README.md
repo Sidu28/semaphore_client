@@ -1,4 +1,4 @@
-# semaphore_client
+# Zero knowledge Voting System based on Semaphore V2.0.0 
 
 install dependencies:
 `npm install`
