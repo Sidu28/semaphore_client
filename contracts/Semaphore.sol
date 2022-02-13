@@ -198,7 +198,6 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
       hashSignal(_signal) == _signalHash &&
       _signalHash == hashSignal(_signal) &&
       isExternalNullifierActive(_externalNullifier) &&
-      rootHistory[_root] &&
       areAllValidFieldElements(_proof) &&
       _root < SNARK_SCALAR_FIELD &&
       _nullifiersHash < SNARK_SCALAR_FIELD &&
@@ -231,9 +230,6 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
 
     // Check whether the nullifier hash is active
     //require(isExternalNullifierActive(_externalNullifier), "Semaphore: external nullifier not found");
-
-    // Check whether the given Merkle root has been seen previously
-    require(rootHistory[_root], "Semaphore: root not seen");
 
     uint256 signalHash = hashSignal(_signal);
 

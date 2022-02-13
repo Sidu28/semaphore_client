@@ -25,6 +25,7 @@ const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddre
 
 
 const tree = new IncrementalMerkleTree(poseidon, 16, BigInt(0), 2) // Binary tree.
+let rootHistory = new Map<number, boolean>();
 
 async function main() {
 
@@ -45,8 +46,8 @@ async function main() {
     var nullifierHash = Semaphore.genNullifierHash(externalNullifier,identityNullifier)
 
 
-    console.log(await semaphoreContract.methods.sender().call({from: PUBLIC_KEY}))
-    console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
+    //console.log(await semaphoreContract.methods.sender().call({from: PUBLIC_KEY}))
+    //console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
     await broadcastSignal(0, proof, tree.root, nullifierHash, externalNullifier)
     //console.log(msg)
     clearTree()
@@ -55,6 +56,9 @@ async function main() {
 
 async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any, externalNullifier:any){
 
+  if(!rootHistory.get(root)){
+    throw 'root has not been seen before'
+  }
   await semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier).call({from: PUBLIC_KEY})
 }
 
@@ -62,12 +66,14 @@ async function registerIdentity(){
   //create new identity and identity commitment
   const identity = new ZkIdentity()
   const identityCommitment = identity.genIdentityCommitment();
+  const identityNullifier = identity.getNullifier()
 
 
   tree.insert(identityCommitment)
 
+  rootHistory.set(tree.root(), true)
 
-  const identityNullifier = identity.getNullifier()
+  
   return [identity, identityCommitment, identityNullifier]
 }
 
