@@ -1,7 +1,7 @@
 import { ZkIdentity } from "@zk-kit/identity"
 import { poseidon } from "circomlibjs"
 import { IncrementalMerkleTree } from "@zk-kit/incremental-merkle-tree"
-import { Semaphore, genExternalNullifier,generateMerkleProof } from "@zk-kit/protocols"
+import { Semaphore, genExternalNullifier,generateMerkleProof, genSignalHash } from "@zk-kit/protocols"
 import { parseBytes32String, formatBytes32String } from "ethers/lib/utils";
 
 const process = require("process");
@@ -19,7 +19,7 @@ const web3 = createAlchemyWeb3(ALCHEMY_KEY);
 
 //contract data
 const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
-const semaphoreAddress = "0xB9944dc7aC92613E335d1AD3944e721A5605D2aD"
+const semaphoreAddress = "0xf1f0BFfa8131271114E663D30275064acf264346"
 const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddress);
 
 
@@ -35,7 +35,7 @@ async function main() {
 
     [identity, identityCommitment, identityNullifier] = await registerIdentity();
 
-
+    console.log(tree.depth)
     const merkleProof = await genMerkleProof(identityCommitment);
 
     var externalNullifier;
@@ -47,18 +47,23 @@ async function main() {
 
 
     //console.log(await semaphoreContract.methods.sender().call({from: PUBLIC_KEY}))
-    //console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
-    await broadcastSignal(0, proof, tree.root, nullifierHash, externalNullifier)
+    console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
+    
+
+    var signal = 'yes'
+    var signalHash = genSignalHash(signal)
+    await broadcastSignal(0, proof, tree.root, nullifierHash, signalHash, externalNullifier)
     //console.log(msg)
     clearTree()
 }
 
 
-async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any, externalNullifier:any){
+async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any, signalHash:any, externalNullifier:any){
 
   if(!rootHistory.get(root)){
     throw 'root has not been seen before'
   }
+  await semaphoreContract.methods.preBroadcastCheck(ote, proof, root, nullifierHash, signalHash, externalNullifier)
   await semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier).call({from: PUBLIC_KEY})
 }
 
@@ -71,7 +76,7 @@ async function registerIdentity(){
 
   tree.insert(identityCommitment)
 
-  rootHistory.set(tree.root(), true)
+  rootHistory.set(tree.root, true)
 
   
   return [identity, identityCommitment, identityNullifier]
