@@ -19,7 +19,7 @@ const web3 = createAlchemyWeb3(ALCHEMY_KEY);
 
 //contract data
 const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
-const semaphoreAddress = "0xf1C1F3256213A75fAFE08E402C62C0d760Dc7CFc"
+const semaphoreAddress = "0xB9944dc7aC92613E335d1AD3944e721A5605D2aD"
 const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddress);
 
 
@@ -45,6 +45,8 @@ async function main() {
     var nullifierHash = Semaphore.genNullifierHash(externalNullifier,identityNullifier)
 
 
+    console.log(await semaphoreContract.methods.sender().call({from: PUBLIC_KEY}))
+    console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
     await broadcastSignal(0, proof, tree.root, nullifierHash, externalNullifier)
     //console.log(msg)
     clearTree()
