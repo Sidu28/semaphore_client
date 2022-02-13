@@ -6,6 +6,7 @@ export type { IncrementalQuinTree } from "./IncrementalQuinTree";
 export type { Ownable } from "./Ownable";
 export type { PoseidonT3 } from "./PoseidonT3";
 export type { PoseidonT6 } from "./PoseidonT6";
+export type { INounsAnonDAOLogicV1 } from "./INounsAnonDAOLogicV1";
 export type { Semaphore } from "./Semaphore";
 export type { SemaphoreClient } from "./SemaphoreClient";
 export type { Verifier } from "./Verifier";
@@ -15,6 +16,7 @@ export { IncrementalQuinTree__factory } from "./factories/IncrementalQuinTree__f
 export { Ownable__factory } from "./factories/Ownable__factory";
 export { PoseidonT3__factory } from "./factories/PoseidonT3__factory";
 export { PoseidonT6__factory } from "./factories/PoseidonT6__factory";
+export { INounsAnonDAOLogicV1__factory } from "./factories/INounsAnonDAOLogicV1__factory";
 export { Semaphore__factory } from "./factories/Semaphore__factory";
 export { SemaphoreClient__factory } from "./factories/SemaphoreClient__factory";
 export { Verifier__factory } from "./factories/Verifier__factory";

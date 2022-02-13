@@ -32,7 +32,7 @@ const hardhatConfig: HardhatUserConfig = {
       url: "https://eth-rinkeby.alchemyapi.io/v2/ElybgFn6H7hx1EfEsGvMKsD-psxb2gsy",
       accounts: ['0x857a00ccb22178ab0387154dcbd3b2cd2c887f21ba2cec5664cf7957381e2831'],
       gasMultiplier: 10,
-      gas: 5000000,
+      gas: 10000000,
     },
   },
   etherscan: {

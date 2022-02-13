@@ -5,6 +5,13 @@ import "./Verifier.sol";
 import {IncrementalQuinTree} from "./IncrementalMerkleTree.sol";
 import "./Ownable.sol";
 
+
+//interface for logicV1 contract
+interface INounsAnonDAOLogicV1 {
+  function castAnonVote(uint256 proposalId, uint8 support, string calldata reason) external;
+}
+
+
 contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
   // The external nullifier helps to prevent double-signalling by the same
   // user. An external nullifier can be active or deactivated.
@@ -15,6 +22,9 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
     bool exists;
     bool isActive;
   }
+
+  //address of NounsLogicV1 contract
+  address logicAddr;
 
   // We store the external nullifiers using a mapping of the form:
   // enA => { next external nullifier; if enA exists; if enA is active }
@@ -34,6 +44,7 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
   // Whether the contract has already seen a particular nullifier hash
   mapping(uint256 => bool) public nullifierHashHistory;
 
+  event Voter(address voter);
   event PermissionSet(bool indexed newPermission);
   event ExternalNullifierAdd(uint232 indexed externalNullifier);
   event ExternalNullifierChangeStatus(uint232 indexed externalNullifier, bool indexed active);
@@ -77,6 +88,7 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
    *                            be the output of a Pedersen hash. It is the
    *                            responsibility of the caller to verify this.
    */
+
   function insertIdentity(uint256 _identityCommitment) public onlyOwner returns (uint256) {
     // Ensure that the given identity commitment is not the zero value
     require(
@@ -218,7 +230,7 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
     require(nullifierHashHistory[_nullifiersHash] == false, "Semaphore: nullifier already seen");
 
     // Check whether the nullifier hash is active
-    require(isExternalNullifierActive(_externalNullifier), "Semaphore: external nullifier not found");
+    //require(isExternalNullifierActive(_externalNullifier), "Semaphore: external nullifier not found");
 
     // Check whether the given Merkle root has been seen previously
     require(rootHistory[_root], "Semaphore: root not seen");
@@ -255,12 +267,16 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
     uint256 _root,
     uint256 _nullifiersHash,
     uint232 _externalNullifier
-  ) public onlyOwnerIfPermissioned isValidSignalAndProof(_signal, _proof, _root, _nullifiersHash, _externalNullifier) {
+  ) public onlyOwnerIfPermissioned isValidSignalAndProof(_signal, _proof, _root, _nullifiersHash, _externalNullifier) returns (string memory){
     // Client contracts should be responsible for storing the signal and/or
     // emitting it as an event
 
     // Store the nullifiers hash to prevent double-signalling
     nullifierHashHistory[_nullifiersHash] = true;
+
+    string memory mesg = "broadcast signal successful";
+    return mesg;
+
   }
 
   /*
@@ -393,5 +409,19 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
     isBroadcastPermissioned = _newPermission;
 
     emit PermissionSet(_newPermission);
+  }
+
+  function sender () public returns(address) {
+    return msg.sender;
+  }
+
+  //sets the address of the Logic contract as the Proxy
+  function setLogicAddyasProxy(address _logic) public payable {
+    logicAddr = _logic;
+  }
+
+  function castVote(uint256 proposalId, uint8 support, string calldata reason) public {
+    INounsAnonDAOLogicV1(logicAddr).castAnonVote(proposalId, support, reason);
+
   }
 }

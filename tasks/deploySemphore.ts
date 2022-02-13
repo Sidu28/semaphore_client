@@ -13,21 +13,20 @@ task("deploy:semaphore", "Deploy a Semaphore contract")
     const poseidonT6ABI = poseidonContract.generateABI(5)
     const poseidonT6Bytecode = poseidonContract.createCode(5)
 
-
-    console.log(poseidonT3ABI)
-
-    console.log("THIS IS T6")
-    console.log(poseidonT6ABI)
-
     const [signer] = await ethers.getSigners()
+
 
     const PoseidonLibT3Factory = new ethers.ContractFactory(poseidonT3ABI, poseidonT3Bytecode, signer)
     const poseidonT3Lib = await PoseidonLibT3Factory.deploy()
     const PoseidonLibT6Factory = new ethers.ContractFactory(poseidonT6ABI, poseidonT6Bytecode, signer)
     const poseidonT6Lib = await PoseidonLibT6Factory.deploy()
 
+
+    console.log("T3 transaction:", poseidonT3Lib.deployTransaction.hash);
     await poseidonT3Lib.deployed()
     await poseidonT6Lib.deployed()
+
+
 
     logs && console.log(`PoseidonT3 library has been deployed to: ${poseidonT3Lib.address}`)
     logs && console.log(`PoseidonT6 library has been deployed to: ${poseidonT6Lib.address}`)

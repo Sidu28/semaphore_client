@@ -9,6 +9,7 @@ import {
   CallOverrides,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -23,6 +24,7 @@ export interface SemaphoreInterface extends utils.Interface {
     "NOTHING_UP_MY_SLEEVE_ZERO()": FunctionFragment;
     "addExternalNullifier(uint232)": FunctionFragment;
     "broadcastSignal(bytes,uint256[8],uint256,uint256,uint232)": FunctionFragment;
+    "castVote(uint256,uint8,string)": FunctionFragment;
     "deactivateExternalNullifier(uint232)": FunctionFragment;
     "externalNullifierLinkedList(uint232)": FunctionFragment;
     "firstExternalNullifier()": FunctionFragment;
@@ -46,6 +48,8 @@ export interface SemaphoreInterface extends utils.Interface {
     "renounceOwnership()": FunctionFragment;
     "root()": FunctionFragment;
     "rootHistory(uint256)": FunctionFragment;
+    "sender()": FunctionFragment;
+    "setLogicAddyasProxy(address)": FunctionFragment;
     "setPermissioning(bool)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unpackProof(uint256[8])": FunctionFragment;
@@ -69,6 +73,10 @@ export interface SemaphoreInterface extends utils.Interface {
       BigNumberish,
       BigNumberish
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "castVote",
+    values: [BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "deactivateExternalNullifier",
@@ -166,6 +174,11 @@ export interface SemaphoreInterface extends utils.Interface {
     functionFragment: "rootHistory",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "sender", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "setLogicAddyasProxy",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "setPermissioning",
     values: [boolean]
@@ -200,6 +213,7 @@ export interface SemaphoreInterface extends utils.Interface {
     functionFragment: "broadcastSignal",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "castVote", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "deactivateExternalNullifier",
     data: BytesLike
@@ -271,6 +285,11 @@ export interface SemaphoreInterface extends utils.Interface {
     functionFragment: "rootHistory",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "sender", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setLogicAddyasProxy",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setPermissioning",
     data: BytesLike
@@ -294,6 +313,7 @@ export interface SemaphoreInterface extends utils.Interface {
     "LeafInsertion(uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PermissionSet(bool)": EventFragment;
+    "Voter(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ExternalNullifierAdd"): EventFragment;
@@ -303,6 +323,7 @@ export interface SemaphoreInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "LeafInsertion"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PermissionSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Voter"): EventFragment;
 }
 
 export type ExternalNullifierAddEvent = TypedEvent<
@@ -342,6 +363,10 @@ export type PermissionSetEvent = TypedEvent<
 >;
 
 export type PermissionSetEventFilter = TypedEventFilter<PermissionSetEvent>;
+
+export type VoterEvent = TypedEvent<[string], { voter: string }>;
+
+export type VoterEventFilter = TypedEventFilter<VoterEvent>;
 
 export interface Semaphore extends BaseContract {
   contractName: "Semaphore";
@@ -384,6 +409,13 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    castVote(
+      proposalId: BigNumberish,
+      support: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -497,6 +529,15 @@ export interface Semaphore extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    sender(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setLogicAddyasProxy(
+      _logic: string,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setPermissioning(
       _newPermission: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -540,6 +581,13 @@ export interface Semaphore extends BaseContract {
     _root: BigNumberish,
     _nullifiersHash: BigNumberish,
     _externalNullifier: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  castVote(
+    proposalId: BigNumberish,
+    support: BigNumberish,
+    reason: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -647,6 +695,15 @@ export interface Semaphore extends BaseContract {
 
   rootHistory(arg0: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
+  sender(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setLogicAddyasProxy(
+    _logic: string,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setPermissioning(
     _newPermission: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -690,6 +747,13 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    castVote(
+      proposalId: BigNumberish,
+      support: BigNumberish,
+      reason: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -801,6 +865,13 @@ export interface Semaphore extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    sender(overrides?: CallOverrides): Promise<string>;
+
+    setLogicAddyasProxy(
+      _logic: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setPermissioning(
       _newPermission: boolean,
       overrides?: CallOverrides
@@ -870,6 +941,9 @@ export interface Semaphore extends BaseContract {
       newPermission?: boolean | null
     ): PermissionSetEventFilter;
     PermissionSet(newPermission?: boolean | null): PermissionSetEventFilter;
+
+    "Voter(address)"(voter?: null): VoterEventFilter;
+    Voter(voter?: null): VoterEventFilter;
   };
 
   estimateGas: {
@@ -886,6 +960,13 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    castVote(
+      proposalId: BigNumberish,
+      support: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -993,6 +1074,15 @@ export interface Semaphore extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    sender(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setLogicAddyasProxy(
+      _logic: string,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setPermissioning(
       _newPermission: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1033,6 +1123,13 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    castVote(
+      proposalId: BigNumberish,
+      support: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1148,6 +1245,15 @@ export interface Semaphore extends BaseContract {
     rootHistory(
       arg0: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    sender(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setLogicAddyasProxy(
+      _logic: string,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setPermissioning(
