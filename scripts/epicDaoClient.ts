@@ -63,7 +63,7 @@ async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any,
   if(!rootHistory.get(root)){
     throw 'root has not been seen before'
   }
-  await semaphoreContract.methods.preBroadcastCheck(ote, proof, root, nullifierHash, signalHash, externalNullifier)
+  await semaphoreContract.methods.preBroadcastCheck(vote, proof, root, nullifierHash, signalHash, externalNullifier).call({from: PUBLIC_KEY})
   await semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier).call({from: PUBLIC_KEY})
 }
 
