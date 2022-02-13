@@ -19,7 +19,7 @@ const web3 = createAlchemyWeb3(ALCHEMY_KEY);
 
 //contract data
 const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
-const semaphoreAddress = "0xf1f0BFfa8131271114E663D30275064acf264346"
+const semaphoreAddress = "0x5364cc8d95d514aa71e3f2ad7C6105f42676EA01"
 const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddress);
 
 
@@ -103,7 +103,7 @@ async function createZKProof(identity:any, merkleProof:any){
     //generate secret witness 
     const witness = Semaphore.genWitness(identity.getTrapdoor(),identity.getNullifier(), merkleProof, externalNullifier, signal)
 
-    const proof = await Semaphore.genProof(witness, "./zkey_files/semaphore.wasm", "./zkey_files/semaphore_final.zkey")
+    const proof = await Semaphore.genProof(witness, "./build/snark/semaphore.wasm", "./build/snark/semaphore_final.zkey")
     const solidity_proof = await generateSolidityProof(proof)
 
     return [externalNullifier, solidity_proof]

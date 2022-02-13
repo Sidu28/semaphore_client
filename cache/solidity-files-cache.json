@@ -185,8 +185,8 @@
       ]
     },
     "/Users/sidu/Downloads/semaphore_client/contracts/Semaphore.sol": {
-      "lastModificationDate": 1644722681698,
-      "contentHash": "5445bd00663b24eadcceec4bd6b75e17",
+      "lastModificationDate": 1644729938073,
+      "contentHash": "725ec06bbb5c1220bce07ee47e470c90",
       "sourceName": "contracts/Semaphore.sol",
       "solcConfig": {
         "version": "0.8.4",
