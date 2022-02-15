@@ -34,7 +34,7 @@ async function main() {
 
     await download(url, buildPath)
   }
-
+  
   await exec(`circom ./circuits/semaphore.circom --r1cs --wasm -o ${buildPath}`)
 
   await zKey.newZKey(

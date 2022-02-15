@@ -24,7 +24,7 @@ const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddre
 
 
 
-const tree = new IncrementalMerkleTree(poseidon, 16, BigInt(0), 2) // Binary tree.
+const tree = new IncrementalMerkleTree(poseidon, 20, BigInt(0), 5) // Binary tree.
 let rootHistory = new Map<number, boolean>();
 
 async function main() {
