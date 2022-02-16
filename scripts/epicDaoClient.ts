@@ -3,6 +3,9 @@ import { poseidon } from "circomlibjs"
 import { IncrementalMerkleTree } from "@zk-kit/incremental-merkle-tree"
 import { Semaphore, genExternalNullifier,generateMerkleProof, genSignalHash } from "@zk-kit/protocols"
 import { parseBytes32String, formatBytes32String } from "ethers/lib/utils";
+import { json } from "stream/consumers";
+import * as verification_key from '../build/snark/verification_key.json'
+
 
 const process = require("process");
 require("dotenv").config();
@@ -19,7 +22,7 @@ const web3 = createAlchemyWeb3(ALCHEMY_KEY);
 
 //contract data
 const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
-const semaphoreAddress = "0x5364cc8d95d514aa71e3f2ad7C6105f42676EA01"
+const semaphoreAddress = "0x5C83c041825fc6DCB21cd8e0a5bf394669A2f612"
 const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddress);
 
 
@@ -41,13 +44,13 @@ async function main() {
     var externalNullifier;
     var proof;
     [externalNullifier, proof] = await createZKProof(identity, merkleProof)
-
-
-    var nullifierHash = Semaphore.genNullifierHash(externalNullifier,identityNullifier)
+    
+    
+    var nullifierHash = Semaphore.genNullifierHash(BigInt(String(externalNullifier)), BigInt(String(identityNullifier)))
 
 
     //console.log(await semaphoreContract.methods.sender().call({from: PUBLIC_KEY}))
-    console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
+    //console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
     
 
     var signal = 'yes'
@@ -55,6 +58,8 @@ async function main() {
     await broadcastSignal(0, proof, tree.root, nullifierHash, signalHash, externalNullifier)
     //console.log(msg)
     clearTree()
+
+    
 }
 
 
@@ -98,49 +103,38 @@ async function genMerkleProof(leaf:any){
 async function createZKProof(identity:any, merkleProof:any){
     const signal = "0x111"
     const externalNullifier = genExternalNullifier("voting_1")
+
+
+    console.log("adding external nullifier....")
     //await addExternalNullifierToContract(externalNullifier)
+
+    console.log("added external nullifier")
 
     //generate secret witness 
     const witness = Semaphore.genWitness(identity.getTrapdoor(),identity.getNullifier(), merkleProof, externalNullifier, signal)
 
+    console.log("witness generated", witness)
     const proof = await Semaphore.genProof(witness, "./build/snark/semaphore.wasm", "./build/snark/semaphore_final.zkey")
-    const solidity_proof = await generateSolidityProof(proof)
+    
+    console.log("proof generated")
+
+    const solidity_proof = await Semaphore.packToSolidityProof(proof)
+
+    console.log("proof packed generated")
+
+
+    console.log( verification_key)
+    var verify = await Semaphore.verifyProof(verification_key, proof)
+
+    console.log("proof verified:", verify)
 
     return [externalNullifier, solidity_proof]
 }
 
 
 
-async function clearTree(){
-  const leaf_list = tree.leaves
-  for(let leaf of leaf_list){
-    const idx = tree.indexOf(leaf);
-
-    tree.delete(idx)
-  }
-
-}
-
-
-
 
 //HELPER FUNCTIONS
-
-async function generateSolidityProof(proof:any){
-  const proof_temp = await Semaphore.packToSolidityProof(proof);
-
-  var solidity_proof = [
-    proof_temp.a[0],
-    proof_temp.a[1],
-    proof_temp.b[0][1],
-    proof_temp.b[0][0],
-    proof_temp.b[1][1],
-    proof_temp.b[1][0],
-    proof_temp.c[0],
-    proof_temp.c[1]
-  ]
-  return solidity_proof
-}
 
 
 async function addExternalNullifierToContract(externalNullifier:any){
@@ -168,6 +162,16 @@ async function addExternalNullifierToContract(externalNullifier:any){
    }).on('receirpt', function(receipt:any){
     console.log(receipt)
    })
+}
+
+async function clearTree(){
+  const leaf_list = tree.leaves
+  for(let leaf of leaf_list){
+    const idx = tree.indexOf(leaf);
+
+    tree.delete(idx)
+  }
+
 }
 
 
