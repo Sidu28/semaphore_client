@@ -20,7 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface SemaphoreClientInterface extends utils.Interface {
   contractName: "SemaphoreClient";
   functions: {
-    "broadcastSignal(bytes,uint256[8],uint256,uint256,uint232)": FunctionFragment;
+    "broadcastSignal(bytes,uint256[8],uint256,uint256,uint232,uint256,string)": FunctionFragment;
     "getExternalNullifierBySignalIndex(uint256)": FunctionFragment;
     "getSignalBySignalIndex(uint256)": FunctionFragment;
     "nextSignalIndex()": FunctionFragment;
@@ -36,7 +36,9 @@ export interface SemaphoreClientInterface extends utils.Interface {
       BigNumberish[],
       BigNumberish,
       BigNumberish,
-      BigNumberish
+      BigNumberish,
+      BigNumberish,
+      string
     ]
   ): string;
   encodeFunctionData(
@@ -136,6 +138,8 @@ export interface SemaphoreClient extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -170,6 +174,8 @@ export interface SemaphoreClient extends BaseContract {
     _root: BigNumberish,
     _nullifiersHash: BigNumberish,
     _externalNullifier: BigNumberish,
+    proposalId: BigNumberish,
+    reason: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -204,6 +210,8 @@ export interface SemaphoreClient extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -248,6 +256,8 @@ export interface SemaphoreClient extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -283,6 +293,8 @@ export interface SemaphoreClient extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

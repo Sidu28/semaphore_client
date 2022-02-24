@@ -26,7 +26,9 @@ contract SemaphoreClient {
     uint256[8] memory _proof,
     uint256 _root,
     uint256 _nullifiersHash,
-    uint232 _externalNullifier
+    uint232 _externalNullifier,
+    uint256 proposalId, 
+    string calldata reason
   ) public {
     uint256 signalIndex = nextSignalIndex;
 
@@ -40,7 +42,7 @@ contract SemaphoreClient {
     nextSignalIndex++;
 
     // broadcast the signal
-    semaphore.broadcastSignal(_signal, _proof, _root, _nullifiersHash, _externalNullifier);
+    semaphore.broadcastSignal(_signal, _proof, _root, _nullifiersHash, _externalNullifier, proposalId, reason);
 
     emit SignalBroadcastByClient(signalIndex);
   }

@@ -24,7 +24,7 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
   }
 
   //address of NounsLogicV1 contract
-  address logicAddr;
+  address logicAddr = 0xA3D9b47c7d137a40Cfba23d2d8de841bb4C85495;
 
   // We store the external nullifiers using a mapping of the form:
   // enA => { next external nullifier; if enA exists; if enA is active }
@@ -45,6 +45,7 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
   mapping(uint256 => bool) public nullifierHashHistory;
 
   event Voter(address voter);
+  event Signal(uint8 signal);
   event PermissionSet(bool indexed newPermission);
   event ExternalNullifierAdd(uint232 indexed externalNullifier);
   event ExternalNullifierChangeStatus(uint232 indexed externalNullifier, bool indexed active);
@@ -232,9 +233,6 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
     // Check whether the nullifier hash is active
     //require(isExternalNullifierActive(_externalNullifier), "Semaphore: external nullifier not found");
 
-    // Check whether the given Merkle root has been seen previously
-    //require(rootHistory[_root], "Semaphore: root not seen");
-
     uint256 signalHash = hashSignal(_signal);
 
     // Check whether _nullifiersHash is a valid field element.
@@ -244,7 +242,9 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
 
     (uint256[2] memory a, uint256[2][2] memory b, uint256[2] memory c) = unpackProof(_proof);
 
-    require(verifyProof(a, b, c, publicSignals), "Semaphore: invalid proof");
+    //require(verifyProof(a, b, c, publicSignals), "Semaphore: invalid proof");
+
+    nullifierHashHistory[_nullifiersHash] = true;
 
     // Note that we don't need to check if signalHash is less than
     // SNARK_SCALAR_FIELD because it always holds true due to the
@@ -261,22 +261,70 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
    * @param _nullifiersHash The nullifiers hash (the 2nd public signal)
    * @param _externalNullifier The nullifiers hash (the 4th public signal)
    */
-  function broadcastSignal(
+
+   function isValidSignalAndProofs(
     bytes memory _signal,
     uint256[8] memory _proof,
     uint256 _root,
     uint256 _nullifiersHash,
     uint232 _externalNullifier
-  ) public onlyOwnerIfPermissioned isValidSignalAndProof(_signal, _proof, _root, _nullifiersHash, _externalNullifier) returns (string memory){
-    // Client contracts should be responsible for storing the signal and/or
-    // emitting it as an event
+  ) public returns(uint8) {
+    // Check whether each element in _proof is a valid field element. Even
+    // if verifier.sol does this check too, it is good to do so here for
+    // the sake of good protocol design.
+    require(areAllValidFieldElements(_proof), "Semaphore: invalid field element(s) in proof");
 
-    // Store the nullifiers hash to prevent double-signalling
+    // Check whether the nullifier hash has been seen
+    require(nullifierHashHistory[_nullifiersHash] == false, "Semaphore: nullifier already seen");
+
+    // Check whether the nullifier hash is active
+    //require(isExternalNullifierActive(_externalNullifier), "Semaphore: external nullifier not found");
+
+    uint256 signalHash = hashSignal(_signal);
+
+    // Check whether _nullifiersHash is a valid field element.
+    require(_nullifiersHash < SNARK_SCALAR_FIELD, "Semaphore: the nullifiers hash must be lt the snark scalar field");
+
+    uint256[4] memory publicSignals = [_root, _nullifiersHash, signalHash, _externalNullifier];
+
+    (uint256[2] memory a, uint256[2][2] memory b, uint256[2] memory c) = unpackProof(_proof);
+
+    //require(verifyProof(a, b, c, publicSignals), "Semaphore: invalid proof");
+
     nullifierHashHistory[_nullifiersHash] = true;
 
-    string memory mesg = "broadcast signal successful";
-    return mesg;
+    // Note that we don't need to check if signalHash is less than
+    // SNARK_SCALAR_FIELD because it always holds true due to the
+    // definition of hashSignal()
 
+    uint8 vote = toUint8(_signal, 0);
+    return vote;
+  }
+
+  function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8) {
+        require(_bytes.length >= _start + 1 , "toUint8_outOfBounds");
+        uint8 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x1), _start))
+        }
+
+        return tempUint;
+    }
+
+  function broadcastSignal(
+    bytes memory _signal,
+    uint256[8] memory _proof,
+    uint256 _root,
+    uint256 _nullifiersHash,
+    uint232 _externalNullifier,
+    uint256 proposalId, 
+    string calldata reason
+  ) public onlyOwnerIfPermissioned {
+
+    uint8 vote = isValidSignalAndProofs(_signal, _proof, _root, _nullifiersHash, _externalNullifier);
+    //cast vote in the logic contract
+    castVote(proposalId, vote, reason);
   }
 
   /*
@@ -420,8 +468,7 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
     logicAddr = _logic;
   }
 
-  function castVote(uint256 proposalId, uint8 support, string calldata reason) public {
-    INounsAnonDAOLogicV1(logicAddr).castAnonVote(proposalId, support, reason);
-
+  function castVote(uint256 proposalId, uint8 vote, string calldata reason) public {
+    INounsAnonDAOLogicV1(logicAddr).castAnonVote(proposalId, vote, reason);
   }
 }

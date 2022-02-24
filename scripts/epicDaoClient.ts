@@ -22,12 +22,14 @@ const web3 = createAlchemyWeb3(ALCHEMY_KEY);
 
 //contract data
 const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
-const semaphoreAddress = "0x5C83c041825fc6DCB21cd8e0a5bf394669A2f612"
+const semaphoreAddress = "0x4896cF4d955a85D6Ebf9bbB25EEaf13a2578c2C7"
 const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddress);
 
+const proxyAddress = "0x6CC655b204C093BcD2B3b3eBC531E86E953563d1"
 
 
-const tree = new IncrementalMerkleTree(poseidon, 20, BigInt(0), 5) // Binary tree.
+
+const tree = new IncrementalMerkleTree(poseidon, 20, BigInt(0), 5) 
 let rootHistory = new Map<number, boolean>();
 
 async function main() {
@@ -45,7 +47,6 @@ async function main() {
     var proof;
     [externalNullifier, proof] = await createZKProof(identity, merkleProof)
     
-    
     var nullifierHash = Semaphore.genNullifierHash(BigInt(String(externalNullifier)), BigInt(String(identityNullifier)))
 
 
@@ -53,23 +54,72 @@ async function main() {
     //console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
     
 
-    var signal = 'yes'
+    var signal = "0x1"
+    var proposalID = '6'
     var signalHash = genSignalHash(signal)
-    await broadcastSignal(0, proof, tree.root, nullifierHash, signalHash, externalNullifier)
+    var reason = "I love epicDAO so much"
+
+    await broadcastVote(signal, proof, tree.root, nullifierHash, signalHash, externalNullifier, proposalID, reason)
     //console.log(msg)
-    clearTree()
+    //clearTree()
 
     
 }
 
 
-async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any, signalHash:any, externalNullifier:any){
+const broadcastVote = async (
+  vote:any, proof:any, root:any, nullifierHash:any, signalHash:any, externalNullifier:any, proposalID:any,reason:any
+) => {
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest"); //get latest nonce
+
+  const tx = {
+    from: PUBLIC_KEY,
+    to: semaphoreAddress,
+    nonce: nonce,
+    gas: 500000,
+    maxPriorityFeePerGas: 1999999987,
+    data: semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier, proposalID, reason).encodeABI()
+  };
+  console.log("WYA")
+
+
+  const signPromise =  await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
+  //signPromise.then((signedTx:any) => {
+  await web3.eth.sendSignedTransaction(
+        signPromise.rawTransaction,
+        function (err:any, hash:any) {
+          if (!err) {
+            console.log(
+              "The hash of your transaction is: ",
+              hash,
+              "\nCheck Alchemy's Mempool to view the status of your transaction!"
+            );
+          } else {
+            console.log(
+              "Something went wrong when submitting your transaction:",
+              err
+            );
+          }
+        }
+      )
+    .catch((err:any) => {
+      console.log("Promise failed:", err);
+    });
+};
+
+
+async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any, signalHash:any, externalNullifier:any, proposalID:any,reason:any){
 
   if(!rootHistory.get(root)){
     throw 'root has not been seen before'
   }
+  //await semaphoreContract.methods.setLogicAddyasProxy(proxyAddress).send({from: PUBLIC_KEY})
   await semaphoreContract.methods.preBroadcastCheck(vote, proof, root, nullifierHash, signalHash, externalNullifier).call({from: PUBLIC_KEY})
-  await semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier).call({from: PUBLIC_KEY})
+
+  const response = await semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier, proposalID, reason).send({from: PUBLIC_KEY})
+
+
+
 }
 
 async function registerIdentity(){
@@ -113,17 +163,19 @@ async function createZKProof(identity:any, merkleProof:any){
     //generate secret witness 
     const witness = Semaphore.genWitness(identity.getTrapdoor(),identity.getNullifier(), merkleProof, externalNullifier, signal)
 
-    console.log("witness generated", witness)
+    console.log("witness generated")
     const proof = await Semaphore.genProof(witness, "./build/snark/semaphore.wasm", "./build/snark/semaphore_final.zkey")
     
     console.log("proof generated")
+
+    console.log(proof.publicSignals)
 
     const solidity_proof = await Semaphore.packToSolidityProof(proof)
 
     console.log("proof packed generated")
 
 
-    console.log( verification_key)
+   
     var verify = await Semaphore.verifyProof(verification_key, proof)
 
     console.log("proof verified:", verify)
@@ -184,3 +236,5 @@ main()
     console.error(error);
     process.exit(1);
   });
+
+

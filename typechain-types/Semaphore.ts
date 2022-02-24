@@ -23,7 +23,7 @@ export interface SemaphoreInterface extends utils.Interface {
   functions: {
     "NOTHING_UP_MY_SLEEVE_ZERO()": FunctionFragment;
     "addExternalNullifier(uint232)": FunctionFragment;
-    "broadcastSignal(bytes,uint256[8],uint256,uint256,uint232)": FunctionFragment;
+    "broadcastSignal(bytes,uint256[8],uint256,uint256,uint232,uint256,string)": FunctionFragment;
     "castVote(uint256,uint8,string)": FunctionFragment;
     "deactivateExternalNullifier(uint232)": FunctionFragment;
     "externalNullifierLinkedList(uint232)": FunctionFragment;
@@ -38,6 +38,7 @@ export interface SemaphoreInterface extends utils.Interface {
     "isBroadcastPermissioned()": FunctionFragment;
     "isExternalNullifierActive(uint232)": FunctionFragment;
     "isOwner()": FunctionFragment;
+    "isValidSignalAndProofs(bytes,uint256[8],uint256,uint256,uint232)": FunctionFragment;
     "lastExternalNullifier()": FunctionFragment;
     "nullifierHashHistory(uint256)": FunctionFragment;
     "numExternalNullifiers()": FunctionFragment;
@@ -71,7 +72,9 @@ export interface SemaphoreInterface extends utils.Interface {
       BigNumberish[],
       BigNumberish,
       BigNumberish,
-      BigNumberish
+      BigNumberish,
+      BigNumberish,
+      string
     ]
   ): string;
   encodeFunctionData(
@@ -129,6 +132,16 @@ export interface SemaphoreInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "isOwner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "isValidSignalAndProofs",
+    values: [
+      BytesLike,
+      BigNumberish[],
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ]
+  ): string;
   encodeFunctionData(
     functionFragment: "lastExternalNullifier",
     values?: undefined
@@ -255,6 +268,10 @@ export interface SemaphoreInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "isValidSignalAndProofs",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "lastExternalNullifier",
     data: BytesLike
   ): Result;
@@ -313,6 +330,7 @@ export interface SemaphoreInterface extends utils.Interface {
     "LeafInsertion(uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PermissionSet(bool)": EventFragment;
+    "Signal(uint8)": EventFragment;
     "Voter(address)": EventFragment;
   };
 
@@ -323,6 +341,7 @@ export interface SemaphoreInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "LeafInsertion"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PermissionSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Signal"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Voter"): EventFragment;
 }
 
@@ -363,6 +382,10 @@ export type PermissionSetEvent = TypedEvent<
 >;
 
 export type PermissionSetEventFilter = TypedEventFilter<PermissionSetEvent>;
+
+export type SignalEvent = TypedEvent<[number], { signal: number }>;
+
+export type SignalEventFilter = TypedEventFilter<SignalEvent>;
 
 export type VoterEvent = TypedEvent<[string], { voter: string }>;
 
@@ -409,12 +432,14 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     castVote(
       proposalId: BigNumberish,
-      support: BigNumberish,
+      vote: BigNumberish,
       reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -484,6 +509,15 @@ export interface Semaphore extends BaseContract {
     ): Promise<[boolean]>;
 
     isOwner(overrides?: CallOverrides): Promise<[boolean]>;
+
+    isValidSignalAndProofs(
+      _signal: BytesLike,
+      _proof: BigNumberish[],
+      _root: BigNumberish,
+      _nullifiersHash: BigNumberish,
+      _externalNullifier: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     lastExternalNullifier(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -581,12 +615,14 @@ export interface Semaphore extends BaseContract {
     _root: BigNumberish,
     _nullifiersHash: BigNumberish,
     _externalNullifier: BigNumberish,
+    proposalId: BigNumberish,
+    reason: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   castVote(
     proposalId: BigNumberish,
-    support: BigNumberish,
+    vote: BigNumberish,
     reason: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -653,6 +689,15 @@ export interface Semaphore extends BaseContract {
   ): Promise<boolean>;
 
   isOwner(overrides?: CallOverrides): Promise<boolean>;
+
+  isValidSignalAndProofs(
+    _signal: BytesLike,
+    _proof: BigNumberish[],
+    _root: BigNumberish,
+    _nullifiersHash: BigNumberish,
+    _externalNullifier: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   lastExternalNullifier(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -747,12 +792,14 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
 
     castVote(
       proposalId: BigNumberish,
-      support: BigNumberish,
+      vote: BigNumberish,
       reason: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -822,6 +869,15 @@ export interface Semaphore extends BaseContract {
     ): Promise<boolean>;
 
     isOwner(overrides?: CallOverrides): Promise<boolean>;
+
+    isValidSignalAndProofs(
+      _signal: BytesLike,
+      _proof: BigNumberish[],
+      _root: BigNumberish,
+      _nullifiersHash: BigNumberish,
+      _externalNullifier: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<number>;
 
     lastExternalNullifier(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -942,6 +998,9 @@ export interface Semaphore extends BaseContract {
     ): PermissionSetEventFilter;
     PermissionSet(newPermission?: boolean | null): PermissionSetEventFilter;
 
+    "Signal(uint8)"(signal?: null): SignalEventFilter;
+    Signal(signal?: null): SignalEventFilter;
+
     "Voter(address)"(voter?: null): VoterEventFilter;
     Voter(voter?: null): VoterEventFilter;
   };
@@ -960,12 +1019,14 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     castVote(
       proposalId: BigNumberish,
-      support: BigNumberish,
+      vote: BigNumberish,
       reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1029,6 +1090,15 @@ export interface Semaphore extends BaseContract {
     ): Promise<BigNumber>;
 
     isOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    isValidSignalAndProofs(
+      _signal: BytesLike,
+      _proof: BigNumberish[],
+      _root: BigNumberish,
+      _nullifiersHash: BigNumberish,
+      _externalNullifier: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     lastExternalNullifier(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1123,12 +1193,14 @@ export interface Semaphore extends BaseContract {
       _root: BigNumberish,
       _nullifiersHash: BigNumberish,
       _externalNullifier: BigNumberish,
+      proposalId: BigNumberish,
+      reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     castVote(
       proposalId: BigNumberish,
-      support: BigNumberish,
+      vote: BigNumberish,
       reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1198,6 +1270,15 @@ export interface Semaphore extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     isOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    isValidSignalAndProofs(
+      _signal: BytesLike,
+      _proof: BigNumberish[],
+      _root: BigNumberish,
+      _nullifiersHash: BigNumberish,
+      _externalNullifier: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     lastExternalNullifier(
       overrides?: CallOverrides
