@@ -22,7 +22,6 @@ const web3 = createAlchemyWeb3(ALCHEMY_KEY);
 
 //contract data
 const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
-//const semaphoreAddress = "0x4896cF4d955a85D6Ebf9bbB25EEaf13a2578c2C7"
 const semaphoreAddress = "0x610875f2E001edAF21E399c68d8CcE7DA4c9f127"
 const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddress);
 
@@ -47,24 +46,13 @@ async function main() {
     var externalNullifier;
     var proof;
     [externalNullifier, proof] = await createZKProof(identity, merkleProof)
-    
     var nullifierHash = Semaphore.genNullifierHash(BigInt(String(externalNullifier)), BigInt(String(identityNullifier)))
-
-
-    //console.log(await semaphoreContract.methods.sender().call({from: PUBLIC_KEY}))
-    //console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
-    
-
     var signal = "0x0"
     var proposalID = '3'
     var signalHash = genSignalHash(signal)
     var reason = "I love epicDAO so much"
 
     await broadcastVote(signal, proof, tree.root, nullifierHash, signalHash, externalNullifier, proposalID, reason)
-    //console.log(msg)
-    //clearTree()
-
-    
 }
 
 
@@ -85,7 +73,6 @@ const broadcastVote = async (
 
 
   const signPromise =  await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
-  //signPromise.then((signedTx:any) => {
   await web3.eth.sendSignedTransaction(
         signPromise.rawTransaction,
         function (err:any, hash:any) {
@@ -114,7 +101,6 @@ async function broadcastSignal(vote:any, proof:any, root:any, nullifierHash:any,
   if(!rootHistory.get(root)){
     throw 'root has not been seen before'
   }
-  //await semaphoreContract.methods.setLogicAddyasProxy(proxyAddress).send({from: PUBLIC_KEY})
   await semaphoreContract.methods.preBroadcastCheck(vote, proof, root, nullifierHash, signalHash, externalNullifier).call({from: PUBLIC_KEY})
 
   const response = await semaphoreContract.methods.broadcastSignal(vote, proof, root, nullifierHash, externalNullifier, proposalID, reason).send({from: PUBLIC_KEY})
@@ -158,7 +144,6 @@ async function createZKProof(identity:any, merkleProof:any){
 
     console.log("adding external nullifier....")
     //await addExternalNullifierToContract(externalNullifier)
-
     console.log("added external nullifier")
 
     //generate secret witness 
