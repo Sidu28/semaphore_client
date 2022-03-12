@@ -3,6 +3,9 @@
 install dependencies:
 `npm install`
 
+Compile circuits and generate verifier:
+`npm run compile:circuits`
+
 compile contracts:
 `npx hardhat compile`
 
