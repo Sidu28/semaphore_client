@@ -5,10 +5,10 @@ import { Semaphore, genExternalNullifier,generateMerkleProof, genSignalHash } fr
 import { parseBytes32String, formatBytes32String } from "ethers/lib/utils";
 import { json } from "stream/consumers";
 import * as verification_key from '../build/snark/verification_key.json'
-
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const process = require("process");
-require("dotenv").config();
 
 
 const ALCHEMY_KEY = process.env.RINKEBY_API_URL;
@@ -22,7 +22,8 @@ const web3 = createAlchemyWeb3(ALCHEMY_KEY);
 
 //contract data
 const semaphoreABI = require("../artifacts/contracts/Semaphore.sol/Semaphore.json")
-const semaphoreAddress = "0x4896cF4d955a85D6Ebf9bbB25EEaf13a2578c2C7"
+//const semaphoreAddress = "0x4896cF4d955a85D6Ebf9bbB25EEaf13a2578c2C7"
+const semaphoreAddress = "0x610875f2E001edAF21E399c68d8CcE7DA4c9f127"
 const semaphoreContract = new web3.eth.Contract(semaphoreABI.abi, semaphoreAddress);
 
 const proxyAddress = "0x6CC655b204C093BcD2B3b3eBC531E86E953563d1"
@@ -54,8 +55,8 @@ async function main() {
     //console.log(await semaphoreContract.methods.owner().call({from: PUBLIC_KEY}))
     
 
-    var signal = "0x1"
-    var proposalID = '6'
+    var signal = "0x0"
+    var proposalID = '3'
     var signalHash = genSignalHash(signal)
     var reason = "I love epicDAO so much"
 

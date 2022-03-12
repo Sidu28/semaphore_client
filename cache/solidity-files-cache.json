@@ -185,8 +185,8 @@
       ]
     },
     "/Users/sidu/Downloads/semaphore_client/contracts/Semaphore.sol": {
-      "lastModificationDate": 1645674864571,
-      "contentHash": "fe975869c7b3898e4fb770f90dfd5557",
+      "lastModificationDate": 1646983291979,
+      "contentHash": "ed5d2fed2f0bcb7ba0b7080a7dfec5aa",
       "sourceName": "contracts/Semaphore.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -225,7 +225,7 @@
       ]
     },
     "/Users/sidu/Downloads/semaphore_client/contracts/Verifier.sol": {
-      "lastModificationDate": 1645453264810,
+      "lastModificationDate": 1646973008661,
       "contentHash": "6de459577180bb105c04275842eb0deb",
       "sourceName": "contracts/Verifier.sol",
       "solcConfig": {

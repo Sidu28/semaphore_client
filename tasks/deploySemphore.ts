@@ -15,6 +15,8 @@ task("deploy:semaphore", "Deploy a Semaphore contract")
 
     const [signer] = await ethers.getSigners()
 
+    console.log("SIGNER", signer)
+
 
     const PoseidonLibT3Factory = new ethers.ContractFactory(poseidonT3ABI, poseidonT3Bytecode, signer)
     const poseidonT3Lib = await PoseidonLibT3Factory.deploy()

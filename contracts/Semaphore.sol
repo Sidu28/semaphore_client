@@ -24,7 +24,8 @@ contract Semaphore is Verifier, Ownable, IncrementalQuinTree {
   }
 
   //address of NounsLogicV1 contract
-  address logicAddr = 0xA3D9b47c7d137a40Cfba23d2d8de841bb4C85495;
+  //address logicAddr = 0xA3D9b47c7d137a40Cfba23d2d8de841bb4C85495;
+  address logicAddr = 0x6524a7235C0f6B5faC27696FEbCc8e85c5422DC5;
 
   // We store the external nullifiers using a mapping of the form:
   // enA => { next external nullifier; if enA exists; if enA is active }
